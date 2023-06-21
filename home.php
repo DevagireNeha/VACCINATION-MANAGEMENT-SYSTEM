@@ -1,20 +1,12 @@
- <!-- Header-->
- <header class="bg-dark py-5" id="main-header">
-    <div class="container px-4 px-lg-5 my-5">
-        <div class="text-center text-white">
-            <h1 class="display-4 fw-bolder"><?php echo $_settings->info('name') ?></h1>
-            <p class="lead fw-normal text-white-50 mb-0">Schedule Now</p>
-        </div>
-    </div>
-</header>
-<!-- Section-->
-<?php 
-$sched_arr = array();
-$max = 0;
+<h1 class="text-light">Welcome to <?php echo $_settings->info('name') ?></h1>
+<?php
+ $sched_arr=array();
 ?>
-<section class="py-5">
-    <div class="container px-4 px-lg-5 mt-5">
-        <div class="row justify-content-center">
+<hr>
+<div class="container">
+  <div class="card">
+    <div class="card-body">
+    <div class="row justify-content-center">
             <div class="col-2">
                 <label for="" class="control-label">Location: </label>
             </div>
@@ -43,10 +35,11 @@ $max = 0;
         </div>
         <div id="calendar"></div>
     </div>
-</section>
+  </div>
+</div>
 <script>
     $(function(){
-        // $('.select2').select2()
+        $('.select2').select2()
         var Calendar = FullCalendar.Calendar;
         var date = new Date()
         var d    = date.getDate(),
@@ -54,7 +47,7 @@ $max = 0;
             y    = date.getFullYear()
         var max = parseInt('<?php echo $max ?>');
         var scheds = $.parseJSON('<?php echo json_encode($sched_arr) ?>');
-        // console.log(scheds)
+        console.log(scheds)
 
         var calendarEl = document.getElementById('calendar');
 
@@ -75,28 +68,37 @@ $max = 0;
                                 else
                                     date  = moment(event.start).add($i,'days')
                                 avail  = !scheds[moment(date).format("YYYY-MM-DD")] ? max : max - parseInt(scheds[moment(date).format("YYYY-MM-DD")]);
-                                // console.log(moment().subtract(1, 'day').diff(date))
+                                sched = !scheds[moment(date).format("YYYY-MM-DD")] ? 0 : scheds[moment(date).format("YYYY-MM-DD")];
                                 if(moment().subtract(1, 'day').diff(date) < 0 && (moment(date).format('dddd') != 'Saturday' && moment(date).format('dddd') != 'Sunday') && avail > 0){
+                                  events.push({
+                                            title          : 'Scheduled: '+sched,
+                                            start          : moment(date).format("YYYY-MM-DD"),
+                                            backgroundColor: 'var(--success)', 
+                                            borderColor    : 'var(--light)', 
+                                            allDay         : true
+                                            });
+                                    
                                     events.push({
                                             title          : 'Available: '+avail,
                                             start          : moment(date).format("YYYY-MM-DD"),
-                                            backgroundColor: 'var(--primary)', //red
-                                            borderColor    : 'var(--light)', //red
+                                            backgroundColor: 'var(--primary)', 
+                                            borderColor    : 'var(--light)', 
                                             allDay         : true
                                             });
                                     }
                                 }
-                           
+                              console.log(events)
                             successCallback(events)
 
                         },
-                        eventClick:function(info){
-                            date = moment(info.event.start).format("YYYY-MM-DD");
-                            uni_modal("","./addSchedule.php?lid=<?php echo $lid ?>&d="+date,"large")
-                        },
+                        // eventClick:function(info){
+                        //     date = moment(info.event.start).format("YYYY-MM-DD");
+                        //     uni_modal("","./addSchedule.php?lid=<?php echo $lid ?>&d="+date,"large")
+                        // },
+                        editable  : true,
                         selectable: true,
                         selectAllow: function(select) {
-                                // console.log(moment(select.start).format('dddd'))
+                                console.log(moment(select.start).format('dddd'))
                             if(moment().subtract(1, 'day').diff(select.start) < 0 && (moment(select.start).format('dddd') != 'Saturday' && moment(select.start).format('dddd') != 'Sunday'))
                                 return true;
                             else
